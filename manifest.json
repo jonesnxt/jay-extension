@@ -1,0 +1,25 @@
+{
+	"manifest_version": 2,
+
+	"name":"Jay Extension",
+	"description": "yes",
+	"version": "1.3.0",
+
+	"browser_action": {
+		"default_icon": "img/jay.png",
+		"default_popup":"html/action.html"
+	},
+
+   	"background": {
+   		"scripts": ["lib/jquery.js", "lib/jay.min.js", "js/keyring.js", "js/omni.js"],
+   		"persistant": "false"
+   	},
+
+   	"content_scripts": [
+   		{
+   			"matches": ["*://*/*"],
+			"js":["lib/jquery.js","js/cs.js"],
+			"css":["css/cs.css"]
+   		}
+   	]
+}

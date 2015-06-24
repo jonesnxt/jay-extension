@@ -1,0 +1,19 @@
+keyring.js - is in change of all password securing and signing, works like a keyring
+	must be unlocked by the cs or otherwise to function, only stays unlocked for a small
+	time. completely isolated.
+
+cs.js - content script, loaded into the page, takes over for jay.js when it is loaded,
+	sets up all the intent functions and handles the okaying process for transactions.
+	also handles the review mechanism.
+
+cs.css - styling for anything cs.js creates smooth and simple designing, sharp corners with
+	soft shadows, subtle contrast.
+
+action.html - the browser action page, handles a small wallet type setup with jay.js requests
+	built in to get basic wallet type things, can make payments with btc and nxt. also
+	in change of all the settings and setting up 2fa with nxtvault if I get that to
+	work.
+
+omni.js - 'jay' keyword in the box. to do things like jay rs address or txid, will bring up
+	the data in a block explorer. handled by the background page. maybe a different page
+	in the background. maybe not...
