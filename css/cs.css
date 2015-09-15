@@ -1,2 +1,591 @@
 /* some cool style */
+@import url(http://fonts.googleapis.com/css?family=Roboto:100,300,700,400);
 
+.jay-btn {
+	background-color: #FFF;
+	font-size: 12pt;
+	border: none;
+	color: #00AADD;
+	font-weight: bold;
+	height: 36px;
+}
+
+.jay-btn:hover {
+	cursor: pointer;
+	background-color: #EEE;
+}
+
+.jay-btn:active {
+	border: none;
+	background-color: #DDD;
+}
+
+.jay-btn:focus {
+	outline: 0;
+}
+
+.jay * {
+	font-family: 'Roboto', sans-serif;
+}
+
+.jay-dialog {
+	z-index: 10;
+	position: absolute;
+	top:0;
+	left:0;
+	height: 100%;
+	width: 100%;
+	background-color: rgba(0,0,0,0.5);
+}
+
+.jay-dialog-content {
+	z-index: 11;
+	position: relative;
+	display: block;
+	width: 500px;
+	margin: 0 auto;
+	top: 200px;
+	background-color: #FFF;
+	box-shadow: 4px 10px 25px 9px rgba(0,0,0,0.4);
+}
+
+.jay-dialog-body {
+	padding: 24px;
+}
+
+.jay-dialog-body h2 {
+	margin: 0;
+	padding-bottom: 8px;
+}
+
+.jay-dialog-body p {
+	color: #666;
+}
+
+.jay-dialog-btn {
+	text-align: right;
+	padding: 8px;
+}
+
+#jay_action {
+	width: 500px;
+	height: 360px;
+}
+
+.jay-input {
+	width: 100%;
+	font-size: 12pt;
+	border: none;
+	border-bottom: 2px solid #AAA;
+	padding-bottom: 0px;
+}
+
+.jay-input:focus {
+	outline: none;
+	border-bottom: 2px solid #00AADD;
+}
+
+.jay-input-group {
+	position: relative;
+	width: 100%;
+}
+
+.jay-input-group .jay-input {
+}
+
+.jay-input-addon {
+	position: absolute;
+	top: 0;
+	right: 0;
+	color: #00AADD;
+	font-weight: bold;
+	padding: 3px 5px;
+}
+
+#jay_action {
+	font-family: "Roboto", sans-serif;
+	margin: 0;
+}
+
+.jay-btn-center {
+	text-align: center;
+}
+
+.jay-btn-em {
+	background-color: #00AADD;
+	color: #fff;
+	text-transform: none;
+}
+
+.jay-btn-em:hover {
+	box-shadow: 1px 2px 1px 1px rgba(0,0,0,0.1);
+	background-color: #fff;
+}
+
+.jay-btn-em:active {
+	border: 1px solid #00AADD;
+}
+
+.jay-new {
+	position: relative;
+	top: 100px;
+}
+
+.jay-new p {
+	text-align: center;
+	font-size: 14pt;
+	color: #444;
+}
+
+#jay_address {
+	font-weight: normal;
+}
+
+#jay_balances {
+	position: absolute;
+	width: 100%;
+	top: 56px;
+	margin: 0;
+}
+
+.jay-balance-nxt {
+	width: 50%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	text-align: center;
+}
+
+.jay-balance-btc {
+	width: 50%;
+	position: absolute;
+	top:0;
+	right: 0;
+	text-align: center;
+}
+
+.jay-balance-amt {
+	font-size: 40pt;
+	font-weight: 100;
+	color: #666;
+	display: inline-block;
+}
+
+.jay-balance-amt:hover {
+	color: #000;
+	cursor: pointer;
+}
+
+.jay-balance-send {
+	color: #666;
+}
+
+.jay-balance-send:hover {
+	cursor: pointer;
+	color: #000;
+}
+
+.jay-balance-side {
+	display: inline-block;
+}
+
+.jay-balance-base {
+	font-size: 16pt;
+	font-weight: 100;
+	color: #666;
+}
+
+/* .jay-balance-base:hover {
+	cursor: pointer;
+	color: #000;
+} */
+
+#jay_topbar {
+	font-size: 12pt;
+	color: #666;
+}	
+
+#jay_name {
+	position: absolute;
+	top: 16px;
+	right: 16px;
+	text-align: right;
+}
+
+#jay_name:hover {
+	color: #000;
+	cursor: pointer;
+}
+
+#jay_activate_sidebar {
+	position: absolute;
+	top: 16px;
+	left: 16px;
+	color: #666;
+	text-transform: capitalize;
+}
+
+#jay_activate_sidebar:hover {
+	cursor: pointer;
+	color: #000;
+}
+
+#jay_transactions {
+	position: absolute;
+	width: 100%;
+	top: 120px;
+}
+
+table.jay-table {
+	width: 100%;
+	text-align: left;
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+.jay-table th {
+	font-style: normal;
+	font-weight: normal;
+	color: rgb(46%,46%,46%);
+	padding: 12px;
+	text-align: left;
+}
+
+.jay-table tbody td {
+	padding: 12px;
+	font-size: 12px;
+}
+
+.jay-table tbody tr {
+	border-top: 1px solid #DDD;
+	display: table;
+    width: 100%;
+}
+
+.jay-table tbody tr:hover {
+	background-color: #EEE;
+}
+
+.jay-table thead {
+	display: table;
+	float: left;
+	width: 100%;
+}
+
+.jay-table thead tr {
+	display: table-row;
+	width: 100%;
+}
+
+.jay-table tbody {
+	display: block;
+	overflow: auto;
+	float: left;
+	width: 100%;
+}
+
+#jay_tx_table tbody {
+	height: 200px;
+}
+
+#jay_contacts_table tbody {
+	height: 224px;
+}
+
+#jay_accounts_table tbody {
+
+}
+
+.jay-table td, .jay-table th {
+	font-size: 14px;
+}
+
+#jay_tx_table td:nth-child(1), #jay_tx_table th:nth-child(1)
+{
+	width: 65px;
+}
+
+#jay_tx_table td:nth-child(2), #jay_tx_table th:nth-child(2)
+{
+	width: 140px;
+}
+
+#jay_tx_table td:nth-child(3), #jay_tx_table th:nth-child(3)
+{
+	width: 80px;
+}
+
+#jay_tx_table td:nth-child(4), #jay_tx_table th:nth-child(4)
+{
+	width: 90px;
+}
+
+
+#jay_contacts_table td:nth-child(1), #jay_contacts_table th:nth-child(1)
+{
+	width: 18px;
+}
+
+#jay_contacts_table td:nth-child(2), #jay_contacts_table th:nth-child(2)
+{
+	width: 160px;
+}
+
+#jay_contacts_table td:nth-child(3), #jay_contacts_table th:nth-child(3)
+{
+	width: 120px;
+}
+
+
+#jay_accounts_table td:nth-child(1), #jay_accounts_table th:nth-child(1)
+{
+	width: 80px;
+}
+
+#jay_accounts_table td:nth-child(2), #jay_accounts_table th:nth-child(2)
+{
+	width: 240px;
+}
+
+#jay_accounts_table td:nth-child(3), #jay_accounts_table th:nth-child(3)
+{
+	width: 80px;
+}
+
+
+#jay_keyring_table td:nth-child(1), #jay_keyring_table th:nth-child(1)
+{
+	width: 18px;
+}
+
+#jay_keyring_table td:nth-child(2), #jay_keyring_table th:nth-child(2)
+{
+	width: 200px;
+}
+
+#jay_keyring_table td:nth-child(3), #jay_keyring_table th:nth-child(3)
+{
+	width: 120px;
+}
+
+
+#jay_action ::-webkit-scrollbar {
+	width: 6px;
+	background-color: #EEE;
+	border-radius: 8px;
+}
+ 
+#jay_action ::-webkit-scrollbar-thumb {
+    background-color: #CCC;
+    border-radius: 8px;
+}
+
+#jay_action ::-webkit-scrollbar-thumb:hover {
+	background-color: #AAA;
+}
+
+.jay-red {
+	color: rgb(255, 0, 0);
+}
+
+.jay-green {
+	color: rgb(0, 100, 0);
+}
+
+#jay_sidebar {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 180px;
+	height:100%;
+	background-color: #FFF;
+	box-shadow: 2px 4px 24px 8px rgba(0,0,0,0.4);
+	border-right: 1px solid #EEE;
+}
+
+.jay-siderow i {
+	text-align: left;
+}
+
+.jay-sidetext {
+	float: right;
+}
+
+.jay-siderow {
+	font-size: 16px;
+	padding: 16px;
+	border-bottom: 1px solid #DDD;
+}
+
+.jay-siderow:hover {
+	background-color: #F5F5F5;
+	cursor: pointer;
+}
+
+.jay-active {
+	background-color: #EEE;
+}
+
+#jay_contacts_top {
+	position: absolute;
+	top: 58px;
+	font-size: 14pt;
+	width: 100%;
+	text-align: center;
+}
+
+#jay_contacts_add {
+	position: absolute;
+	color: rgb(0, 100, 0);
+	left: 24px;
+	top: -4px;
+	font-size: 24px;
+}
+
+#jay_contacts_add :hover {
+	cursor: pointer;
+}
+
+#jay_contacts_add i:hover:before {
+	content: "\f0fe";
+}
+
+#jay_contacts_count {
+	position: absolute;
+	left: 60px;
+	color: #666;
+}
+
+#jay_contacts_trash {
+	position: absolute;
+	right: 24px;
+	color: #AAA;
+	top: -4px;
+	font-size: 24px;
+}
+
+#jay_contacts_hr {
+	position: absolute;
+	top: -90px;
+	width: 100%;
+	border: none;
+	border-bottom: 1px solid #DDD;
+}
+
+
+#jay_contacts_table {
+	position: absolute;
+	top: 95px;
+}
+
+#jay_accounts_table {
+	position: absolute;
+	top: 45px;
+}
+
+#jay_keyring_table {
+	position: absolute;
+	top: 95px;
+}
+
+.jay-checkbox, .jay-checkbox-sample {
+	font-size: 18px !important;
+}
+
+.jay-checkbox[checked]:before {
+	content: "\f046";
+	color: #2196F3;
+}
+
+.jay-checkbox:hover:before {
+	color: #2196F3;
+	cursor: pointer;
+}
+
+.jay-checkbox[checked]:hover:before {
+	content: "\f046";
+}
+
+.jay-contact-name {
+}
+
+.jay-contact-name:hover {
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+.jay-tag {
+	background-color: #2196F3;
+	color: #fff;
+	border-radius: 2px;
+	padding: 2px 4px;
+	font-weight: bold;
+}
+
+.jay-tag:hover {
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.jay-contacts-append {
+	font-size: 16px !important;
+	color: rgb(0, 100, 0);
+}
+
+.jay-contacts-append:hover:before {
+	content: "\f0fe";
+	cursor: pointer;
+}
+
+#jay_contacts_search {
+	width: 250px;
+	position: relative;
+	left: 180px;
+	bottom: 3px;
+}
+
+
+.jay-note {
+	color: #666;
+}
+
+.jay-note i {
+	float: right;
+}
+
+.jay-note:hover {
+	cursor: pointer;
+	color: #000;
+}
+
+#jay_name_dropper {
+	position: absolute;
+	top: 42px;
+	right: 16px;
+	box-shadow: 3px 5px 20px 1px rgba(0,0,0,0.4);
+	background-color: #fff;
+	z-index: 1;
+	font-size: 14px;
+	color: #333;
+}
+
+.jay-dropper-row {
+	padding: 10px;
+	border-bottom: 1px solid #EEE;
+}
+
+.jay-dropper-row:hover {
+	background-color: #F1F1F1;
+}
+
+/* Blue
+
+#004455  primary dark blue
+#00AADD  primary light blue
+#808080  primary grayish
+#333333  secondary dark gray
+#b2b2b2  secondary light gray
+#004455  gradient dark blue
+#0088AA  gradient light blue
+
+*/

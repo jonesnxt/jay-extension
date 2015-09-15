@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<head>
+	<link href="../css/cs.css" rel="stylesheet" />
+	<link href="../css/font-awesome.min.css" rel="stylesheet" />
+
+	<script src="../lib/jquery.js"></script>
+	<script src="../js/action.js"></script>
+</head>
+<body id="jay_action">
+
+
+	<div id="jay_topbar">
+		<div id="jay_activate_sidebar">
+				<i class="fa fa-bars"></i>
+				<span id="jay_page_name">Dashboard</span>
+		</div>
+		<div id="jay_name">
+			Jones
+		</div>
+		<div id="jay_name_dropper" style="display: none;">
+			<div id="jay_name_rs" class="jay-dropper-row">NXT-RJU8-JSNR-H9J4-2KWKY</div>
+			<div id="jay_name_btc" class="jay-dropper-row">1NOTuoruDUnoteuOECUdOUntou9</div>
+		</div>
+	</div>
+
+	<div id="jay_dashboard">
+		
+		<div id="jay_balances">
+			<div class="jay-balance-nxt">
+				<div class="jay-balance-content">
+					<div id="jay_nxt_balance" class="jay-balance-amt" title="120'034.0003 NXT">
+						120
+					</div>
+					<div class="jay-balance-side">
+						<div class="jay-balance-send">
+							<i class="fa fa-2x fa-envelope"></i>
+						</div>
+						<div class="jay-balance-base" id="jay_nxt_balance_base">
+							kNXT
+						</div>
+					</div>	
+				</div>
+			</div>
+			<div class="jay-balance-btc">
+				<div id="jay_btc_balance" class="jay-balance-amt" title="0.200038 BTC">
+					200
+				</div>
+				<div class="jay-balance-side">
+					<div class="jay-balance-send">
+						<i class="fa fa-2x fa-envelope"></i>
+					</div>
+					<div class="jay-balance-base" id="jay_btc_balance_base">
+						mBTC
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="jay_transactions">
+			<table id="jay_tx_table" class="jay-table">
+				<thead>
+					<tr>
+						<th>Type</th>
+						<th>Amount</th>
+						<th>Account</th>
+						<th>Time</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Recieve</td>
+						<td class="jay-green"><i class="fa fa-plus"></i> 1000 NXT</td>
+						<td title="NXT-YCLA-V44V-USJK-3GPJD">3GPJD</td>
+						<td>10 min ago</td>
+					</tr>
+					<tr>
+						<td>Send</td>
+						<td class="jay-red"><i class="fa fa-minus"></i> 223 mBTC</td>
+						<td title="NXT-YCLA-V44V-USJK-3GPJD">JL777</td>
+						<td>4 hr ago</td>
+					</tr>
+					<tr>
+						<td>Bid Order</td>
+						<td>20 Jay @ 20 NXT</td>
+						<td title="NXT-YCLA-V44V-USJK-3GPJD">you</td>
+						<td>5 hr ago</td>
+					</tr>
+					<tr>
+						<td>Alias</td>
+						<td>'somealias'</td>
+						<td>you</td>
+						<td>13 hr ago</td>
+					</tr>
+					<tr>
+						<td>Send</td>
+						<td class="jay-red"><i class="fa fa-minus"></i> 100 Jay</td>
+						<td title="NXT-QK5L-7YM9-YPVF-55GL5">55GL5</td>
+						<td>1 day ago</td>
+					</tr>
+					<tr>
+						<td>Bid Order</td>
+						<td>20 SuperNET @ 10 NXT</td>
+						<td title="NXT-YCLA-V44V-USJK-3GPJD">you</td>
+						<td>2 days ago</td>
+					</tr>
+					<tr>
+						<td>Recieve</td>
+						<td>1000 NXT</td>
+						<td title="NXT-YCLA-V44V-USJK-3GPJD">3GPJD</td>
+						<td>3 Eays</td>
+					</tr>
+					<tr>
+						<td>Recieve</td>
+						<td>1000 NXT</td>
+						<td title="NXT-YCLA-V44V-USJK-3GPJD">3GPJD</td>
+						<td>3 Eays</td>
+					</tr>
+					<tr>
+						<td>Recieve</td>
+						<td>1000 NXT</td>
+						<td title="NXT-YCLA-V44V-USJK-3GPJD">3GPJD</td>
+						<td>3 Eays</td>
+					</tr>
+					<tr>
+						<td>Recieve</td>
+						<td>1000 NXT</td>
+						<td title="NXT-YCLA-V44V-USJK-3GPJD">3GPJD</td>
+						<td>3 Eays</td>
+					</tr>
+					<tr>
+						<td>Recieve</td>
+						<td>1000 NXT</td>
+						<td title="NXT-YCLA-V44V-USJK-3GPJD">3GPJD</td>
+						<td>3 Eays</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<div id="jay_contacts" style="display: none;">
+		<div id="jay_contacts_top">
+			<div id="jay_contacts_add"><i class="fa fa-plus"></i></div>
+			<div id="jay_contacts_count">3 Contacts</div>
+			<div id="jay_contacts_search">
+				<input type="text" placeholder="Search" class="jay-input">
+			</div>	
+			<div id="jay_contacts_trash"><i class="fa fa-trash-o"></i></div>
+		</div>
+			<hr id="jay_contacts_hr"/>
+		<table id="jay_contacts_table" class="jay-table">
+			<thead>
+				<tr>
+					<th><i class="jay-checkbox-sample fa fa-square-o"></i></th>
+					<th>Name</th>
+					<th>Accounts</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><i class="jay-checkbox fa fa-square-o"></i></td>
+					<td class="jay-contact-name">Jones</td>
+					<td><span class="jay-tag">NXT</span> <span class="jay-tag">BTC</span> <i class="fa fa-plus jay-contacts-append"></i></td>
+				</tr>
+				<tr>
+					<td><i class="jay-checkbox fa fa-square-o"></i></td>
+					<td class="jay-contact-name">James</td>
+					<td><span class="jay-tag">NXT</span> <i class="fa fa-plus jay-contacts-append"></i></td>
+				</tr>
+				<tr>
+					<td><i class="jay-checkbox fa fa-square-o"></i></td>
+					<td class="jay-contact-name">Long Name man with a really long name</td>
+					<td><span class="jay-tag">NXT</span> <span class="jay-tag">BTC</span> <i class="fa fa-plus jay-contacts-append"></i></td>
+				</tr>
+				<tr>
+					<td><i class="jay-checkbox fa fa-square-o"></i></td>
+					<td class="jay-contact-name">Abctc</td>
+					<td><span class="jay-tag">NXT</span> <span class="jay-tag">DOGE</span> <i class="fa fa-plus jay-contacts-append"></i></td>
+				</tr>
+				<tr>
+					<td><i class="jay-checkbox fa fa-square-o"></i></td>
+					<td class="jay-contact-name">Jones</td>
+					<td><span class="jay-tag">NXT</span> <span class="jay-tag">BTC</span> <i class="fa fa-plus jay-contacts-append"></i></td>
+				</tr>
+				<tr>
+					<td><i class="jay-checkbox fa fa-square-o"></i></td>
+					<td class="jay-contact-name">Jones</td>
+					<td><span class="jay-tag">NXT</span> <span class="jay-tag">BTC</span> <i class="fa fa-plus jay-contacts-append"></i></td>
+				</tr>
+				<tr>
+					<td><i class="jay-checkbox fa fa-square-o"></i></td>
+					<td class="jay-contact-name">Jones</td>
+					<td><span class="jay-tag">NXT</span> <span class="jay-tag">BTC</span> <i class="fa fa-plus jay-contacts-append"></i></td>
+				</tr>
+				<tr>
+					<td><i class="jay-checkbox fa fa-square-o"></i></td>
+					<td class="jay-contact-name">Jones</td>
+					<td><span class="jay-tag">NXT</span> <span class="jay-tag">BTC</span> <i class="fa fa-plus jay-contacts-append"></i></td>
+				</tr>
+				<tr>
+					<td><i class="jay-checkbox fa fa-square-o"></i></td>
+					<td class="jay-contact-name">Jones</td>
+					<td><span class="jay-tag">NXT</span> <span class="jay-tag">BTC</span> <i class="fa fa-plus jay-contacts-append"></i></td>
+				</tr>
+				<tr>
+					<td><i class="jay-checkbox fa fa-square-o"></i></td>
+					<td class="jay-contact-name">Jones</td>
+					<td><span class="jay-tag">NXT</span> <span class="jay-tag">BTC</span> <i class="fa fa-plus jay-contacts-append"></i></td>
+				</tr>
+				<tr>
+					<td><i class="jay-checkbox fa fa-square-o"></i></td>
+					<td class="jay-contact-name">Jones</td>
+					<td><span class="jay-tag">NXT</span> <span class="jay-tag">BTC</span> <i class="fa fa-plus jay-contacts-append"></i></td>
+				</tr>
+				<tr>
+					<td><i class="jay-checkbox fa fa-square-o"></i></td>
+					<td class="jay-contact-name">Jones</td>
+					<td><span class="jay-tag">NXT</span> <span class="jay-tag">BTC</span> <i class="fa fa-plus jay-contacts-append"></i></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<div id="jay_accounts" style="display: none;">
+		<table id="jay_accounts_table" class="jay-table">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Address</th>
+					<th>Balance</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Nxt</td>
+					<td>NXT-ABCD-EFGH-JKLM-NPQRS</td>
+					<td>100 NXT</td>
+				</tr>
+				<tr>
+					<td>Bitcoin</td>
+					<td>1NotunTDOnuour98NToundoun</td>
+					<td>100 mBTC</td>
+				</tr>
+				<tr>
+					<td>Doge</td>
+					<td><span class="jay-tag">Create</span></td>
+					<td>N/A</td>
+				</tr>
+
+			</tbody>
+		</table>
+	</div>
+
+	<div id="jay_keyring" style="display: none;">
+
+		<div id="jay_contacts_top">
+			<div id="jay_contacts_add"><i class="fa fa-plus"></i></div>
+			<div id="jay_contacts_count">3 Contacts</div>
+			<div id="jay_contacts_trash"><i class="fa fa-trash-o"></i></div>
+		</div>
+		<table id="jay_keyring_table" class="jay-table">
+			<thead>
+				<tr>
+					<th><i class="jay-checkbox-sample fa fa-square-o"></i></th>
+					<th>Website</th>
+					<th>Permissions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><i class="jay-checkbox fa fa-square-o"></td>
+					<td>jnxt.org</td>
+					<td><span class="jay-tag">auth</span> <span class="jay-tag">contacts</span>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<div id="jay_settings" style="display: none;">
+
+	</div>
+
+	<div id="jay_sidebar" style="display: none;">
+		<div class="jay-siderow jay-active" id="jay_option_dashboard">
+			<i class="fa fa-dashboard"></i> 
+			<div class="jay-sidetext" data-i18n="dashboard">Dashboard</div>
+		</div>
+		<div class="jay-siderow" id="jay_option_contacts">
+			<i class="fa fa-bookmark"></i> 
+			<div class="jay-sidetext" data-i18n="contacts">Contacts</div>
+		</div>
+		<div class="jay-siderow" id="jay_option_accounts">
+			<i class="fa fa-user"></i> 
+			<div class="jay-sidetext" data-i18n="accounts">Accounts</div>
+		</div>
+		<div class="jay-siderow" id="jay_option_keyring">
+			<i class="fa fa-key"></i> 
+			<div class="jay-sidetext" data-i18n="keyring">Keyring</div>
+		</div>
+		<div class="jay-siderow" id="jay_option_settings">
+			<i class="fa fa-wrench"></i> 
+			<div class="jay-sidetext" data-i18n="settings">Settings</div>
+		</div>
+	</div>
+
+
+	<div id="jay_new" style="display: none;">
+		<p data-i18n="welcome_to_jay">Welcome to Jay, to get started you need an Nxt account.</p>
+		<div class="jay-btn-center">
+			<button type="button" class="jay-btn jay-btn-em" data-i18n="import_existing">Import Existing</button>
+			<button type="button" class="jay-btn jay-btn-em" data-i18n="new_account">New Account</button>
+		</div>
+	</div>
+</body>
+</html> 
