@@ -8,8 +8,12 @@
 // 5. i have no clue...
 
 $("document").ready(function() {
+
 	JayDB.init();
 	Contacts.init();
+
+	JayDB.debug("contacts");
+
 })
 
 
@@ -21,11 +25,19 @@ JayDB.schema = [];
 JayDB.init = function() {
 	// make sure that all of the schema data is loaded into our localized db.
 	JayDB.fromExt("schema", function(value) {
-		JayDB.schema = JSON.parse(value);
-		tablesLoaded = 0;
-		for(var a=0;a<JayDB.schema.length;a++)
+		console.log(value.schema);
+		if(value.schema != undefined)
 		{
-			JayDb.loadDB(JayDB.schema[a], JayDB.loaded);
+			JayDB.schema = JSON.parse(value.schema);
+			tablesLoaded = 0;
+			for(var a=0;a<JayDB.schema.length;a++)
+			{
+				JayDB.loadDB(JayDB.schema[a], JayDB.loaded);
+			}
+		}
+		else
+		{
+			JayDB.toExt("schema", "[]", JayDB.init);
 		}
 	})
 }
@@ -44,8 +56,8 @@ JayDB.loadDB = function(name, callback)
 	JayDB.fromExt("schema."+name, function(keys) {
 		JayDB.fromExt(name, function(table) {
 			JayDB.db[name] = {};
-			JayDB.db[name].rows = table;
-			JayDB.db[name].keys = keys;
+			JayDB.db[name].rows = JSON.parse(table[name]);
+			JayDB.db[name].keys = JSON.parse(keys["schema."+name]);
 			callback(name);
 		});
 	});
@@ -53,12 +65,14 @@ JayDB.loadDB = function(name, callback)
 
 JayDB.ready = function() {
 	console.log("db has been offloaded");
+	console.log(JayDB.db);
+	JayDB.insert("contacts", ["jones", "NXT-...", "1aoenudaoenut"]);
 }
 
 JayDB.createTable = function(name, schema, callback)
 {
 	JayDB.schema.push(name);
-	JayDB.toExt("schema", JSON.stringify(schema), function() {
+	JayDB.toExt("schema", JSON.stringify(JayDB.schema), function() {
 		JayDB.toExt("schema."+name, JSON.stringify(schema), function() {
 			JayDB.toExt(name, "[]", callback);
 		})
@@ -68,7 +82,9 @@ JayDB.createTable = function(name, schema, callback)
 
 JayDB.toExt = function(key, value, callback)
 {
-	chrome.storage.local.set({key: value}, callback);
+	var obj = {};
+	obj[key] = value;
+	chrome.storage.local.set(obj, callback);
 }
 
 JayDB.fromExt = function(key, callback)
@@ -81,9 +97,52 @@ JayDB.select = function(table, a)
 {
 
 }
-JayDB.insertInto = function(table, values)
+JayDB.insert = function(table, values, callback)
 {
+	JayDB.db[table].rows.push(values);
+	JayDB.fromExt(table, function(val) {
+		var tbl = JSON.parse(val[table]);
+		tbl.push(values);
+		JayDB.toExt(table, JSON.stringify(tbl), callback);
+	})
+}
 
+JayDB.select = function(table, key, compare)
+{
+	var schema = JayDB.db[table].keys;
+	var tbl = JayDB.db[table].rows;
+
+	var ret = [];
+	var k = -1;
+	for(var a=0;a<schema.length;a++)
+	{
+		if(schema[a] == key)
+		{
+			k = a;
+		}
+	}
+	if(k == -1)
+	{
+		console.log("Key not found");
+	}
+	else
+	{
+		for(var b=0;b<tbl.length;b++)
+		{
+			if(tbl[b][k] == compare)
+			{
+				ret.push(tbl[b]);
+			}
+		}
+	}
+	return ret;
+}
+
+JayDB.debug = function(value)
+{
+	chrome.storage.local.get(value, function(v) {
+		console.log(v);
+	})
 }
 
 
