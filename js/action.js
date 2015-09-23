@@ -2,6 +2,7 @@
 
 $(document).ready(function() {
 
+
 	$("#jay_activate_sidebar").click(function() {
 		Page.show("#jay_sidebar");
 		$("#jay_sidebar").css("left", "-200px");
@@ -45,6 +46,7 @@ $(document).ready(function() {
 	Page.init();
 	Req.init();
 	Dash.init();
+	Contacts.init();
 });
 
 var Page = {};
@@ -300,6 +302,27 @@ Dash.addLoadMoreTxButton = function()
 }
 
 
+var Contacts = {};
+Contacts.init = function() {
+	Comm.toKeyring({"requestType":"select","params":["contacts","*"]}, function(resp)
+	{
+		console.log(resp);
+		rows = "";
+		for(var a=0;a<resp.length;a++)
+		{
+			rows += "<tr>";
+			rows += "<td><i class='jay-checkbox fa fa-square-o'></i></td>";
+			rows += "<td class='jay-contact-name'>"+resp[a].name+"</td>";
+			rows += "<td><span class='jay-tag' title='"+resp[a].nxt+"'>"+Tx.trimAccount(resp[a].nxt)+"</span> <i class='fa fa-plus jay-contacts-append'></i></td>";
+			rows += "</tr>";
+		}
+
+		$("#jay_contacts_table tbody").append(rows);
+	});
+
+}
+
+
 var Util = {};
 
 Util.formatNumber = function(number, seperator, decimals)
@@ -452,6 +475,11 @@ Tx.getData = function(tx)
 	return "<td> &mdash; </td>";
 }
 
+Tx.trimAccount = function(acc)
+{
+	return acc.slice(acc.length-5)
+}
+
 Tx.parseAccount = function(sender, recipient)
 {
 	var rs = "";
@@ -480,4 +508,13 @@ Asset.getDecimals = function(asset)
 Asset.getName = function(asset)
 {
 	return "Jay";
+}
+
+
+var Comm = {};
+Comm.toKeyring = function(message, callback)
+{
+	message.source = "action";
+	message.location = "keyring";
+	chrome.runtime.sendMessage(message, callback);
 }

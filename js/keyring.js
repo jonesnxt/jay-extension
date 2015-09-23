@@ -7,25 +7,13 @@
 // 4. handle all of the user password stuff, how does a user actually auth themselves...?
 // 5. i have no clue...
 
-$("document").ready(function() {
-
-	JayDB.init();
-	Contacts.init();
-
-	JayDB.debug("contacts");
-
-})
-
-
 var JayDB = {};
 JayDB.db = {};
 JayDB.schema = [];
 
-
 JayDB.init = function() {
 	// make sure that all of the schema data is loaded into our localized db.
 	JayDB.fromExt("schema", function(value) {
-		console.log(value.schema);
 		if(value.schema != undefined)
 		{
 			JayDB.schema = JSON.parse(value.schema);
@@ -65,8 +53,6 @@ JayDB.loadDB = function(name, callback)
 
 JayDB.ready = function() {
 	console.log("db has been offloaded");
-	console.log(JayDB.db);
-	JayDB.insert("contacts", ["jones", "NXT-...", "1aoenudaoenut"]);
 }
 
 JayDB.createTable = function(name, schema, callback)
@@ -89,14 +75,9 @@ JayDB.toExt = function(key, value, callback)
 
 JayDB.fromExt = function(key, callback)
 {
-	console.log(key);
 	chrome.storage.local.get(key, callback);
 }
 
-JayDB.select = function(table, a)
-{
-
-}
 JayDB.insert = function(table, values, callback)
 {
 	JayDB.db[table].rows.push(values);
@@ -111,6 +92,21 @@ JayDB.select = function(table, key, compare)
 {
 	var schema = JayDB.db[table].keys;
 	var tbl = JayDB.db[table].rows;
+
+	if(key == "*")
+	{
+		list = [];
+		for(var d=0;d<tbl.length;d++)
+		{
+			obj = {};
+			for(var e=0;e<schema.length;e++)
+			{
+				obj[schema[e]] = tbl[d][e];
+			}
+			list.push(obj);
+		}
+		return list;
+	}
 
 	var ret = [];
 	var k = -1;
@@ -131,7 +127,13 @@ JayDB.select = function(table, key, compare)
 		{
 			if(tbl[b][k] == compare)
 			{
-				ret.push(tbl[b]);
+				var obj = {};
+				for(var c=0;c<schema.length;c++)
+				{
+					console.log(schema[c]);
+					obj[schema[c]] = tbl[b][c];
+				}
+				ret.push(obj);
 			}
 		}
 	}

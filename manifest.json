@@ -12,7 +12,7 @@
 	},
 
    	"background": {
-   		"scripts": ["lib/jquery.js", "lib/jay.min.js", "js/keyring.js", "js/omni.js"],
+   		"scripts": ["lib/jquery.js", "lib/jay.min.js", "js/background.js", "js/keyring.js", "js/omni.js"],
    		"persistant": "false"
    	},
 
