@@ -28,18 +28,7 @@ $(document).ready(function() {
 		Page.change(page);
 	});
 
-	$(".jay-checkbox").click(function() {
-		if($(this).attr("checked"))
-		{
-			$(this).removeAttr("checked");
-			$(this).parent().parent().removeAttr("style");
-		} 
-		else
-		{
-			$(this).attr("checked", "checked");
-			$(this).parent().parent().css("background-color", "#F5F5F5");
-		} 
-	});
+	$(".jay-checkbox").click(Dash.checkbox);
 
 	$("#jay_name").click(Dash.nameDropper);
 
@@ -301,6 +290,19 @@ Dash.addLoadMoreTxButton = function()
 	return 0;
 }
 
+Dash.checkbox = function() {
+	if($(this).attr("checked"))
+	{
+		$(this).removeAttr("checked");
+		$(this).parent().parent().removeAttr("style");
+	} 
+	else
+	{
+		$(this).attr("checked", "checked");
+		$(this).parent().parent().css("background-color", "#F5F5F5");
+	} 
+}
+
 
 var Contacts = {};
 Contacts.init = function() {
@@ -317,7 +319,8 @@ Contacts.init = function() {
 			rows += "</tr>";
 		}
 
-		$("#jay_contacts_table tbody").append(rows);
+		$("#jay_contacts_table tbody").empty().append(rows);
+		$(".jay-checkbox").unbind("click").click(Dash.checkbox);
 	});
 
 }
