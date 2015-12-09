@@ -12,7 +12,9 @@
 	},
 
    	"background": {
-   		"scripts": ["lib/jquery.js", "lib/jay.min.js", "js/keyring.js", "js/omni.js"],
+   		"scripts": ["lib/jquery.js", "lib/jay.min.js","lib/converters.js", 
+   		"lib/jssha256.js","lib/jsbn.js","lib/jsbn2.js",
+		"lib/nxtaddress.js", "lib/curve25519.js", "js/keyring.js", "js/omni.js"],
    		"persistant": "false"
    	},
 
@@ -22,5 +24,6 @@
 			"js":["lib/jquery.js","js/cs.js"],
 			"css":["css/cs.css"]
    		}
-   	]
+   	],
+   	"web_accessible_resources": ["img/jay.png"]
 }

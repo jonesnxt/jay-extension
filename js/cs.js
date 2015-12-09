@@ -70,6 +70,14 @@ jQuery(document).ready(function($) {
 	{
 		// cool;
 		// from here I'm going to have to route the message to the correct handler...
+
+		console.log(message);
+
+		if(message.search("JAY") == 0)
+		{
+			Tx.handle(message);
+		}
+
 	}
 
 	Comm.toKeyring = function(message, callback)
@@ -119,6 +127,34 @@ jQuery(document).ready(function($) {
 	}
 	Dialog.templates = {};
 	Dialog.templates.message = "<div class='jay_dialog_message'></div>";
+	Dialog.templates.txReqBef = '<div style="opacity: 0;" class="jay-dialog"><div class="jay-dialog-content"><div class="jay-dialog-body"><h2>Transaction Request<img class="jay-logo" src="'+chrome.extension.getURL("./img/jay.png")+'"></h2><p class="msg">';
+	Dialog.templates.txReqAft = '</p></div><div class="jay-dialog-btn"><button id="jay_cancel" type="button" class="jay-btn">CANCEL</button> <button id="jay_accept" type="button" class="jay-btn">ACCEPT</button></div></div></div>';
+
+	Dialog.txReq = function(msg, callback)
+	{
+		$("body").append(Dialog.templates.txReqBef+msg+Dialog.templates.txReqAft);
+		Trs.propTween(".jay-dialog", "opacity", 1, 200, Trs.eases.sqrt);
+		$("#jay_cancel").click(function() {
+			Dialog.close(function() {
+				Comm.toPage("false");
+				callback(false);
+			});
+		});
+		$("#jay_accept").click(function() {
+			Dialog.close(function() {
+				Comm.toPage("true");
+				callback(true);
+			});
+		});
+	}
+
+	Dialog.close = function(msg, callback)
+	{
+		Trs.propTween(".jay-dialog", "opacity", 0, 200, Trs.eases.sqrt, function(){
+			$(".jay-dialog").remove();
+		});
+
+	}
 
 	Dialog.show = function()
 	{
@@ -155,9 +191,62 @@ jQuery(document).ready(function($) {
 	{
 
 	}
-	Tx.trfToUnsignedBytes = function(trf)
+
+	Tx.handle = function()
 	{
 
+
+		Dialog.txReq("Send <strong>10 NXT</strong> to <strong>Jones</strong>?", function(res) {
+			
+		})
+	}
+
+	Tx.trfToUnsignedBytes = function(sender, trfBytes)
+	{
+		var bytes = base62Decode(trfBytes.substring(4));
+		console.log(JSON.stringify(bytes));
+		if(bytes[0] == '1' || bytes[0] == '2')
+		{
+			bytes = bytes.slice(1);
+			if(bytes.length == 31) bytes = bytes.slice(0, 30);
+
+			var collect = [];
+			collect = [bytes[0],bytes[1]]; // type ver & subtype
+			collect = collect.concat(nxtTimeBytes()); // timestamp
+			collect = collect.concat(wordBytes(1440)); // deadline
+			var senderPubKey = converters.hexStringToByteArray(Tx.me.publicKey);
+			collect = collect.concat(senderPubKey);
+			collect = collect.concat(bytes.slice(2, 2+8)); // recipient/genesis
+			collect = collect.concat(bytes.slice(10, 10+8)); // amount
+			collect = collect.concat(bytes.slice(18, 18+8)); // fee
+			collect = collect.concat(pad(32, 0)); // reftxhash
+			collect = collect.concat(pad(64, 0)); // signature bytes
+			collect = collect.concat(bytes.slice(26, 26+4)); // flags
+			collect = collect.concat(pad(4, 0)); // EC blockheight
+			collect = collect.concat(pad(8, 0)); // EC blockid
+			if(bytes.length > 30) collect = collect.concat(bytes.slice(30)); // attachment/appendages
+			
+			
+		}
+		else 
+		{
+			Error.fatal("incorrect trf byte version");
+		}
+	}
+
+	Tx.me = {};
+	Tx.me.publicKey = "234982394629384289347298346293846";
+
+
+	Tx.bold = function()
+	{
+		var output = "";
+		for(var i=0;i<parameters.length;i++)
+		{
+			if(i%2 == 1) output += "<strong>"+parameters[i]+"<strong>";
+			output += parameters[i];
+		}
+		return output;
 	}
 
 	Tx.rewiewBytes = function(bytes)
@@ -180,15 +269,81 @@ jQuery(document).ready(function($) {
 
 	}
  
-	Error.fatal = function()
+	Error.fatal = function(msg)
 	{
-
+		console.log(msg);
 	}
 
 	Error.warning = function() 
 	{
 
 	}
+
+	Util = {};
+
+	Util.xss = function(val) {
+		if(val == undefined) return undefined;
+	    if(typeof(val) != String) return val;
+	    return val.replace("&","&amp;").replace("<", "&lt;").replace(">","&gt;").replace('"', '&quot;').replace("'", "&#x27;").replace("/", "&#x2F;");
+	}
+
+
+
+
+
+var Trs = {};
+Trs.eases = {};
+Trs.eases.linnear = function(x) { return x; };
+Trs.eases.quadradic = function(x) { return x*x; };
+Trs.eases.cubic = function(x) { return x*x*x; };
+Trs.eases.sqrt = function(x) { return Math.sqrt(x); };
+Trs.eases.sine = function(x) { return Math.sin(x*(3.14/2)); };
+
+Trs.propTween = function(item, property, end, duration, ease, callback)
+{
+	var fps = 40;
+
+	var stepms = 1000/fps;
+	var steps = parseInt(duration/stepms);
+	var steplen = 1/steps;
+
+	var startval = $(item).css(property); 
+	var addend = "";
+	console.log(startval);
+	if(isNaN(startval))
+	{
+		if(startval[startval.length-1] == 'x')
+		{
+			startval = Number(startval.substr(0, startval.length-2));
+			addend = "px";
+		}
+		else if(startval[startval.length-1] == '%')
+		{
+			startval = Number(startval.substr(0, startval.length-1));
+			addend = '%';
+		}
+	}
+	startval = Number(startval);
+
+	var width = (end - startval);
+
+	var counter = 0;
+	var accum = 0;
+	var inv = setInterval(function() {
+		if(++counter == steps)
+		{
+			$(item).css(property, end+addend);
+			clearInterval(inv);
+			if(callback != undefined) callback();
+		}
+		else
+		{
+			accum += steplen;
+			$(item).css(property, ((width*ease(accum))+startval)+addend);
+		}
+		
+	}, stepms);
+}
 
 	// time to start up everything..
 	Conf.init();

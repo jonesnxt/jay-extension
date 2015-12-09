@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+	<head>
+
+
+	</head>
+	<body>
+		<button id="btn">go</button>
+
+
+		<script src="./lib/converters.js"></script>
+		<script src="./lib/jssha256.js"></script>
+		<script src="./lib/jsbn.js"></script>
+		<script src="./lib/jsbn2.js"></script>
+		<script src="./lib/nxtaddress.js"></script>
+		<script src="./lib/curve25519.js"></script>
+		<script src="./js/jay.js"></script>
+		<script src="./lib/jquery.js"></script>
+		<script>
+
+		$("#btn").click(function() {
+			Jay.nxt.sendMoney("NXT-RJU8-JSNR-H9J4-2KWKY", 10);
+		});
+
+
+		</script>
+
+	</body>
+</html>
