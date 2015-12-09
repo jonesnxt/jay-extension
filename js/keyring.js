@@ -7,25 +7,25 @@
 // 4. handle all of the user password stuff, how does a user actually auth themselves...?
 // 5. i have no clue...
 
-$("document").ready(function() {
-	JayDB.init();
-	Contacts.init();
-})
-
-
 var JayDB = {};
 JayDB.db = {};
 JayDB.schema = [];
 
-
 JayDB.init = function() {
 	// make sure that all of the schema data is loaded into our localized db.
 	JayDB.fromExt("schema", function(value) {
-		JayDB.schema = JSON.parse(value);
-		tablesLoaded = 0;
-		for(var a=0;a<JayDB.schema.length;a++)
+		if(value.schema != undefined)
 		{
-			JayDb.loadDB(JayDB.schema[a], JayDB.loaded);
+			JayDB.schema = JSON.parse(value.schema);
+			tablesLoaded = 0;
+			for(var a=0;a<JayDB.schema.length;a++)
+			{
+				JayDB.loadDB(JayDB.schema[a], JayDB.loaded);
+			}
+		}
+		else
+		{
+			JayDB.toExt("schema", "[]", JayDB.init);
 		}
 	})
 }
@@ -44,8 +44,8 @@ JayDB.loadDB = function(name, callback)
 	JayDB.fromExt("schema."+name, function(keys) {
 		JayDB.fromExt(name, function(table) {
 			JayDB.db[name] = {};
-			JayDB.db[name].rows = table;
-			JayDB.db[name].keys = keys;
+			JayDB.db[name].rows = JSON.parse(table[name]);
+			JayDB.db[name].keys = JSON.parse(keys["schema."+name]);
 			callback(name);
 		});
 	});
@@ -58,7 +58,7 @@ JayDB.ready = function() {
 JayDB.createTable = function(name, schema, callback)
 {
 	JayDB.schema.push(name);
-	JayDB.toExt("schema", JSON.stringify(schema), function() {
+	JayDB.toExt("schema", JSON.stringify(JayDB.schema), function() {
 		JayDB.toExt("schema."+name, JSON.stringify(schema), function() {
 			JayDB.toExt(name, "[]", callback);
 		})
@@ -68,22 +68,83 @@ JayDB.createTable = function(name, schema, callback)
 
 JayDB.toExt = function(key, value, callback)
 {
-	chrome.storage.local.set({key: value}, callback);
+	var obj = {};
+	obj[key] = value;
+	chrome.storage.local.set(obj, callback);
 }
 
 JayDB.fromExt = function(key, callback)
 {
-	console.log(key);
 	chrome.storage.local.get(key, callback);
 }
 
-JayDB.select = function(table, a)
+JayDB.insert = function(table, values, callback)
 {
-
+	JayDB.db[table].rows.push(values);
+	JayDB.fromExt(table, function(val) {
+		var tbl = JSON.parse(val[table]);
+		tbl.push(values);
+		JayDB.toExt(table, JSON.stringify(tbl), callback);
+	})
 }
-JayDB.insertInto = function(table, values)
-{
 
+JayDB.select = function(table, key, compare)
+{
+	var schema = JayDB.db[table].keys;
+	var tbl = JayDB.db[table].rows;
+
+	if(key == "*")
+	{
+		list = [];
+		for(var d=0;d<tbl.length;d++)
+		{
+			obj = {};
+			for(var e=0;e<schema.length;e++)
+			{
+				obj[schema[e]] = tbl[d][e];
+			}
+			list.push(obj);
+		}
+		return list;
+	}
+
+	var ret = [];
+	var k = -1;
+	for(var a=0;a<schema.length;a++)
+	{
+		if(schema[a] == key)
+		{
+			k = a;
+		}
+	}
+	if(k == -1)
+	{
+		console.log("Key not found");
+	}
+	else
+	{
+		for(var b=0;b<tbl.length;b++)
+		{
+			if(tbl[b][k] == compare)
+			{
+				var obj = {};
+				for(var c=0;c<schema.length;c++)
+				{
+					console.log(schema[c]);
+					obj[schema[c]] = tbl[b][c];
+				}
+				ret.push(obj);
+			}
+		}
+	}
+	return ret;
+}
+
+JayDB.debug = function(value)
+{
+	chrome.storage.local.get(value, function(v) {
+		console.log(v);
+	})
 }
 
 
