@@ -192,19 +192,110 @@ jQuery(document).ready(function($) {
 
 	}
 
-	Tx.handle = function()
+	Tx.types = {};
+	Tx.subtypes = {};
+
+	Tx.oneNxt = new BigInteger("100000000");	
+	Tx.types.payment = 0;
+	Tx.types.messaging = 1;
+	Tx.types.asset = 2;
+	Tx.types.marketplace = 3;
+	Tx.types.accountControl = 4;
+	Tx.types.monetarySystem = 5;
+	Tx.types.supernet = 100;
+
+	Tx.subtypes.ordinaryPayment = 0;
+	Tx.subtypes.arbitraryMessage = 0;
+	Tx.subtypes.aliasAssignment = 1;
+	Tx.subtypes.pollCreation = 2;
+	Tx.subtypes.voteCasting = 3;
+	Tx.subtypes.hubAnnouncement = 4;
+	Tx.subtypes.accountInfo = 5
+	Tx.subtypes.aliasSell = 6;
+	Tx.subtypes.aliasBuy = 7;
+	Tx.subtypes.aliasDelete = 8;
+	Tx.subtypes.assetIssuance = 0;
+	Tx.subtypes.assetTransfer = 1;
+	Tx.subtypes.askOrderPlacement = 2;
+	Tx.subtypes.bidOrderPlacement = 3;
+	Tx.subtypes.askOrderCancellation = 4;
+	Tx.subtypes.bidOrderCancellation = 5;
+	Tx.subtypes.goodsListing = 0;
+	Tx.subtypes.goodsDelisting = 1;
+	Tx.subtypes.priceChange = 2;
+	Tx.subtypes.quantityChange = 3;
+	Tx.subtypes.purchase = 4;
+	Tx.subtypes.delivery = 5;
+	Tx.subtypes.feedback = 6;
+	Tx.subtypes.refund = 7;
+	Tx.subtypes.balanceLeasing = 0;
+	Tx.subtypes.currencyIssuance = 0;
+	Tx.subtypes.reserveIncrease = 1;
+	Tx.subtypes.reserveClaim = 2;
+	Tx.subtypes.currencyTransfer = 3;
+	Tx.subtypes.exchangeOffer = 4;
+	Tx.subtypes.exchangeBuy = 5;
+	Tx.subtypes.exchangeSell = 6;
+	Tx.subtypes.currencyMinting = 7;
+	Tx.subtypes.currencyDeletion = 8;
+	Tx.subtypes.verifyMgwDepositAddrV1 = 0;
+
+	Tx.appendages = {};
+	Tx.appendages.none = 0;
+	Tx.appendages.message = 1;
+	Tx.appendages.encryptedMessage = 2;
+	Tx.appendages.publicKeyAnnouncement = 4;
+	Tx.appendages.encryptedMessageToSelf = 8;
+	Tx.appendages.phasedTransaction = 16;
+
+
+	Tx.transactionVersion = 1;
+	Tx.TRFVersion = 1;
+
+
+	Tx.handle = function(trf)
 	{
+		var bytes = Tx.trfToUnsignedBytes(trf);
 
+		console.log(bytes);
 
-		Dialog.txReq("Send <strong>10 NXT</strong> to <strong>Jones</strong>?", function(res) {
+		// k now lets get some data...?
+
+		var type = bytes[0];
+		var subtype = bytes[1] % 16;
+		var sender = getAccountIdFromPublicKey(converters.byteArrayToHexString(bytes.slice(8, 8+32)), true);
+		var r = new NxtAddress();
+		r.set(byteArrayToBigInteger(bytes.slice(40, 48)).toString());
+		var recipient = r.toString();
+		var amount = byteArrayToBigInteger(bytes.slice(48, 48+8));
+		var fee = byteArrayToBigInteger(bytes.slice(56, 56+8));
+
+		var message = "";
+
+		if(type == Tx.types.payment)
+		{
+			if(subtype == Tx.subtypes.ordinaryPayment)
+			{
+				message += Tx.bold("Send ",Tx.formatNxt(amount)," to ",recipient," with a ",Tx.formatNxt(fee)," fee");
+			}
+		}
+
+		message += "?";
+
+		Dialog.txReq(message, function(res) {
 			
 		})
 	}
 
-	Tx.trfToUnsignedBytes = function(sender, trfBytes)
+	Tx.formatNxt = function(nxt)
+	{
+		return nxt.divide(Tx.oneNxt).toString()+" NXT";
+	}
+
+	Tx.trfToUnsignedBytes = function(trfBytes)
 	{
 		var bytes = base62Decode(trfBytes.substring(4));
-		console.log(JSON.stringify(bytes));
+		console.log(bytes);
 		if(bytes[0] == '1' || bytes[0] == '2')
 		{
 			bytes = bytes.slice(1);
@@ -226,25 +317,26 @@ jQuery(document).ready(function($) {
 			collect = collect.concat(pad(8, 0)); // EC blockid
 			if(bytes.length > 30) collect = collect.concat(bytes.slice(30)); // attachment/appendages
 			
-			
+			return collect;
 		}
 		else 
 		{
 			Error.fatal("incorrect trf byte version");
+			return false;
 		}
 	}
 
 	Tx.me = {};
-	Tx.me.publicKey = "234982394629384289347298346293846";
+	Tx.me.publicKey = "256a084705a5ddd1f8b9b3e81d08f7493a99a50a9582f7d6995df07c32076309";
 
 
 	Tx.bold = function()
 	{
 		var output = "";
-		for(var i=0;i<parameters.length;i++)
+		for(var i=0;i<arguments.length;i++)
 		{
-			if(i%2 == 1) output += "<strong>"+parameters[i]+"<strong>";
-			output += parameters[i];
+			if(i%2 == 1) output += "<strong>"+arguments[i]+"</strong>";
+			else output += arguments[i];
 		}
 		return output;
 	}
@@ -286,7 +378,6 @@ jQuery(document).ready(function($) {
 	    if(typeof(val) != String) return val;
 	    return val.replace("&","&amp;").replace("<", "&lt;").replace(">","&gt;").replace('"', '&quot;').replace("'", "&#x27;").replace("/", "&#x2F;");
 	}
-
 
 
 

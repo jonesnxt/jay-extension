@@ -98,7 +98,7 @@ Jay.appendages.phasedTransaction = 16;
 
 
 Jay.transactionVersion = 1;
-Jay.TRFVersion = 2;
+Jay.TRFVersion = 1;
 
 
 

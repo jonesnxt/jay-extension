@@ -12,17 +12,20 @@
 	},
 
    	"background": {
-   		"scripts": ["lib/jquery.js", "lib/jay.min.js","js/keyring.js", "js/omni.js"],
+<<<<<<< HEAD
+   		"scripts": ["lib/jquery.js", "lib/jay.min.js","lib/converters.js", 
+   		"lib/jssha256.js","lib/jsbn.js","lib/jsbn2.js",
+		"lib/nxtaddress.js", "lib/curve25519.js", "js/keyring.js", "js/omni.js"],
+=======
+   		"scripts": ["lib/jquery.js", "lib/jay.min.js", "js/background.js", "js/keyring.js", "js/omni.js"],
+>>>>>>> 084c0c33455601bb8373206b8ae40561885a4bc8
    		"persistant": "false"
    	},
 
    	"content_scripts": [
    		{
    			"matches": ["*://*/*"],
-			"js":["lib/jquery.js","lib/converters.js","lib/jssha256.js",
-			"lib/jsbn.js","lib/jsbn2.js","lib/nxtaddress.js",
-			"lib/curve25519.js", "js/util.js", "js/cs.js"],
-
+			"js":["lib/jquery.js","js/cs.js"],
 			"css":["css/cs.css"]
    		}
    	],
