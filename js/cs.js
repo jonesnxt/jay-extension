@@ -1,5 +1,6 @@
 // content script for handling jay intents raised by web applications
 
+
 jQuery.noConflict();
 jQuery(document).ready(function($) {
 
@@ -130,27 +131,30 @@ jQuery(document).ready(function($) {
 	Dialog.templates.txReqBef = '<div style="opacity: 0;" class="jay-dialog"><div class="jay-dialog-content"><div class="jay-dialog-body"><h2>Transaction Request<img class="jay-logo" src="'+chrome.extension.getURL("./img/jay.png")+'"></h2><p class="msg">';
 	Dialog.templates.txReqAft = '</p></div><div class="jay-dialog-btn"><button id="jay_cancel" type="button" class="jay-btn">CANCEL</button> <button id="jay_accept" type="button" class="jay-btn">ACCEPT</button></div></div></div>';
 
-	Dialog.txReq = function(msg, callback)
+	Dialog.txReq = function(msg, bytes, callback)
 	{
 		$("body").append(Dialog.templates.txReqBef+msg+Dialog.templates.txReqAft);
+		$(".jay-dialog .msg strong").each(function() {
+			$(this).html($(this).text());
+	});
 		Trs.propTween(".jay-dialog", "opacity", 1, 200, Trs.eases.sqrt);
 		$("#jay_cancel").click(function() {
 			Dialog.close(function() {
 				Comm.toPage("false");
-				callback(false);
+				callback(false, bytes);
 			});
 		});
 		$("#jay_accept").click(function() {
 			Dialog.close(function() {
 				Comm.toPage("true");
-				callback(true);
+				callback(true, bytes);
 			});
 		});
 	}
 
 	Dialog.close = function(msg, callback)
 	{
-		Trs.propTween(".jay-dialog", "opacity", 0, 200, Trs.eases.sqrt, function(){
+		Trs.propTween(".jay-dialog", "opacity", 0, 200, Trs.eases.sqrt, function() {
 			$(".jay-dialog").remove();
 		});
 
@@ -252,9 +256,19 @@ jQuery(document).ready(function($) {
 	Tx.transactionVersion = 1;
 	Tx.TRFVersion = 1;
 
+	Array.prototype.strip = function(num)
+	{
+		this.splice(0, num);
+	}
+
+
 
 	Tx.handle = function(trf)
 	{
+
+			var arr = [0,1,2,3,4,5];
+			arr.strip(2);
+	console.log(arr);
 		var bytes = Tx.trfToUnsignedBytes(trf);
 
 		console.log(bytes);
@@ -269,22 +283,107 @@ jQuery(document).ready(function($) {
 		var recipient = r.toString();
 		var amount = byteArrayToBigInteger(bytes.slice(48, 48+8));
 		var fee = byteArrayToBigInteger(bytes.slice(56, 56+8));
+		var flags = converters.byteArrayToSignedInt32(bytes.slice(160, 160+4));
+
+		var txlen = 176;
 
 		var message = "";
+
+		bytes.strip(txlen);
+		console.log(bytes);
+
+
+		// types and subtypes
 
 		if(type == Tx.types.payment)
 		{
 			if(subtype == Tx.subtypes.ordinaryPayment)
 			{
-				message += Tx.bold("Send ",Tx.formatNxt(amount)," to ",recipient," with a ",Tx.formatNxt(fee)," fee");
+				message += Tx.bold("Send ",Tx.formatNxt(amount)," to ",recipient);
+				message += Tx.feeCalc(fee);
 			}
+		}
+		else if(type == Tx.types.messaging)
+		{
+			if(subtype == Tx.subtypes.arbitraryMessage)
+			{
+				message += Tx.bold("Send Message to ", recipient);
+				message += Tx.feeCalc(fee);
+			}
+			else if(subtype == Tx.subtypes.aliasAssignment) 
+			{
+				mesage += Tx.bold("Register alias '", Tx.string(bytes))
+
+				typeName = "Alias Assignment";
+				setReview(1, "Type", typeName);
+				setReview(2, "Registrar", sender);
+				var alias = converters.byteArrayToString(rest.slice(2, rest[1]+2));
+				setReview(3, "Alias Name", alias);
+				setReview(4, "Fee", fee/100000000 + " nxt");
+				var data = converters.byteArrayToString(rest.slice(4+rest[1], 4+rest[1]+bytesWord([rest[2+rest[1]], rest[3+rest[1]]])));
+				$("#modal_review_description").removeAttr("disabled");
+				$("#modal_review_description").attr("data-content", data);
+				if(rest.length > 2+rest[1]+bytesWord(rest.slice(2+rest[1], 4+rest[1]))) msg = rest.slice(2+rest[1]+bytesWord(rest.slice(2+rest[1], 4+rest[1])));
+
+				$("#tx_desc").html("Create/update alias <b>" + alias + "</b>");
+			}
+		}
+
+		// appendages
+
+		if(Tx.getModifierBit(flags, 0))
+		{
+			var len = bytesWord([bytes[1],bytes[2]]);
+			var str = converters.byteArrayToString(bytes.slice(5,5+len));
+			message += Tx.bold(", with message: '", Util.xss(str), "'");
+
+			bytes.strip(4+len);
+		}
+
+		if(Tx.getModifierBit(flags, 2))
+		{
+			var str = converters.byteArrayToHexString(msg.slice(1,65));
+			message += Tx.bold(", with public key: '",Util.xss(str), "'");
+			bytes.strip(65);	
 		}
 
 		message += "?";
 
-		Dialog.txReq(message, function(res) {
+		console.log(Util.xss(message));
+
+		Dialog.txReq(message, bytes, function(res, bytes) {
 			
 		})
+	}
+
+	Tx.stringFromLen = function(&bytes, len, offset)
+	{
+		if(len == 1)
+		{
+			return Tx.modString(bytes, bytes[offset], offset+1);
+		}
+		else if(len == 2)
+		{
+			return Tx.modString(bytes, Tx.bytesWord(bytes[offset],bytes[offset+1]), offset+2);
+		}
+	}
+
+	Tx.modString = function(&bytes, len, offset)
+	{
+		if(offset == undefined) offset = 0;
+		var out = converters.byteArrayToString(bytes.slice(offset, len+offset));
+		bytes.strip(len+offset);
+		return out;
+	}
+
+	Tx.getModifierBit = function(target, position)
+	{
+		return (target >> position)%2;
+	}
+
+	Tx.feeCalc = function(fee)
+	{
+		return Tx.bold(" with a fee of ", Tx.formatNxt(fee));
 	}
 
 	Tx.formatNxt = function(nxt)
@@ -335,7 +434,7 @@ jQuery(document).ready(function($) {
 		var output = "";
 		for(var i=0;i<arguments.length;i++)
 		{
-			if(i%2 == 1) output += "<strong>"+arguments[i]+"</strong>";
+			if(i%2 == 1) output += "<strong>"+Util.xss(arguments[i])+"</strong>";
 			else output += arguments[i];
 		}
 		return output;
@@ -374,9 +473,7 @@ jQuery(document).ready(function($) {
 	Util = {};
 
 	Util.xss = function(val) {
-		if(val == undefined) return undefined;
-	    if(typeof(val) != String) return val;
-	    return val.replace("&","&amp;").replace("<", "&lt;").replace(">","&gt;").replace('"', '&quot;').replace("'", "&#x27;").replace("/", "&#x2F;");
+	    return val.replace(/&/g,"&amp;").replace(/</g, "&lt;").replace(/>/g,"&gt;").replace(/"/g, '&quot;').replace(/'/g, "&#x27;").replace(/\//g, "&#x2F;");
 	}
 
 

@@ -132,7 +132,7 @@ Jay.nxt.createTrfBytes = function(type, subtype, recipient, amount, fee, attachm
 	if(appendages == undefined) trf = trf.concat([0,0,0,0]);
 	else trf = trf.concat(appendages.flags);
 	if(attachment != undefined) trf = trf.concat(attachment);
-	if(appendages != undefined) trf = trf.concat(Jay.util.combineAppendages(appendages));
+	if(appendages != undefined) trf = trf.concat(Jay.nxt.combineAppendages(appendages));
 	return Jay.util.positiveByteArray(trf);
 }
 
@@ -159,6 +159,11 @@ Jay.nxt.sendMoney = function(recipient, amount, appendages)
 	Jay.nxt.sendTx(trf);
 }
 
+Jay.nxt.sendMessage = function(recipient, message, appendages)
+{
+	Jay.nxt.sendTx(Jay.nxt.createTrf(Jay.types.messaging, Jay.subtypes.arbitraryMessage, recipient, 0, 1, undefined, Jay.nxt.addAppendage(Jay.appendages.message, message, appendages)));
+}
+
 Jay.nxt.getAddress = function()
 {
 
@@ -168,6 +173,81 @@ Jay.nxt.decryptMessage = function()
 {
 
 }
+
+Jay.nxt.addAppendage = function(newAppendage, newAppendageData, appendages)
+{
+	var flags;
+	if(appendages != undefined)
+	{
+		flags = converters.byteArrayToSignedInt32(appendages.flags);
+	}
+	else 
+	{
+		appendages = {};
+		flags = 0;
+	}
+
+	flags += newAppendage;
+
+	if(newAppendage == Jay.appendages.message)
+	{
+		var data = [];
+		data.push(Jay.transactionVersion);
+		data = data.concat(Jay.util.wordBytes(newAppendageData.length));
+		data.push(0);
+		data.push(128);
+		data = data.concat(converters.stringToByteArray(newAppendageData));
+		appendages.message = data;
+	}
+	/*else if(newAppendage == Jay.appendages.encryptedMessage)
+	{
+		var data = [];
+		data.push(Jay.transactionVersion);
+		data = data.concat(Jay.wordBytes(newAppendageData.length));
+		data = data.concat(converters.stringToByteArray(newAppendageData);
+		appendages.encryptedMessage = data;
+	}*/
+	/*else if(newAppendage == Jay.appendages.encryptedMessageToSelf)
+	{
+		var data = [];
+		data.push(Jay.transactionVersion);
+		data = data.concat(Jay.wordBytes(newAppendageData.length));
+		data = data.concat(converters.stringToByteArray(newAppendageData);
+		appendages.encryptedMessageToSelf = data;
+	}*/
+	if(newAppendage == Jay.appendages.publicKeyAnnouncement)
+	{
+		var data = [];
+		data.push(Jay.transactionVersion);
+		data = data.concat(converters.hexStringToByteArray(newAppendageData));
+		appendages.publicKeyAnnouncement = data;
+	}
+	appendages.flags = converters.int32ToBytes(flags);
+	return appendages;
+}
+
+Jay.nxt.combineAppendages = function(appendages)
+{
+	var data = [];
+	if(appendages.message != undefined)
+	{
+		data = data.concat(appendages.message);
+	}		
+	if(appendages.encryptedMessage != undefined)
+	{
+		data = data.concat(appendages.encryptedMessage)
+	}
+	if(appendages.encryptedMessageToSelf != undefined)
+	{
+		data = data.concat(appendages.encryptedMessageToSelf)
+	}
+	if(appendages.publicKeyAnnouncement != undefined)
+	{
+		data = data.concat(appendages.publicKeyAnnouncement);
+	}
+	return data;
+}
+
 
 // ...
 
@@ -323,7 +403,7 @@ Jay.util.secretPhraseToPublicKey = function(secretPhrase)
 	return curve25519.keygen(digest).p;
 }
 
-Jay.publicKeyToAccountId = function(publicKey, RSFormat)
+Jay.util.publicKeyToAccountId = function(publicKey, RSFormat)
 {
 	var hex = converters.hexStringToByteArray(publicKey);
 
@@ -374,6 +454,12 @@ Jay.util.loadFont = function()
 	    s.parentNode.insertBefore(wf, s);
 	  })();
 }
+
+Jay.util.wordBytes = function(word)
+{
+	return [Math.floor(word%256), Math.floor(word/256)];
+}
+
 
 
 function ready(fn) 
