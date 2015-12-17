@@ -164,6 +164,30 @@ Jay.nxt.sendMessage = function(recipient, message, appendages)
 	Jay.nxt.sendTx(Jay.nxt.createTrf(Jay.types.messaging, Jay.subtypes.arbitraryMessage, recipient, 0, 1, undefined, Jay.nxt.addAppendage(Jay.appendages.message, message, appendages)));
 }
 
+Jay.nxt.setAlias = function(alias, data, appendages)
+{
+	var attachment = [];
+	attachment.push(Jay.transactionVersion);
+	Jay.nxt.addString(attachment, alias, 1);
+	Jay.nxt.addString(attachment, data, 2);
+	Jay.nxt.sendTx(Jay.nxt.createTrf(Jay.types.messaging, Jay.subtypes.aliasAssignment, Jay.genesisRS, 0, 1, attachment, appendages));
+}
+
+Jay.nxt.addString = function(attachment, str, len)
+{
+	if(len == 1)
+	{
+		attachment.push(str.length);
+		attachment.push.apply(attachment, converters.stringToByteArray(str));
+	}
+	else if(len == 2)
+	{
+		attachment.push.apply(attachment, Jay.util.wordBytes(str.length));
+		attachment.push.apply(attachment, converters.stringToByteArray(str));
+	}
+}
+
+
 Jay.nxt.getAddress = function()
 {
 

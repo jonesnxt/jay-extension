@@ -55,7 +55,7 @@ Page.init = function()
 	chrome.browserAction.setBadgeBackgroundColor({
     'color': '#333'
   });
-	chrome.browserAction.setBadgeText({"text":"3"});
+	chrome.browserAction.setBadgeText({"text":"Tx"});
 }
 
 Page.show = function(id)

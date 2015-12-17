@@ -266,15 +266,22 @@ jQuery(document).ready(function($) {
 	Tx.handle = function(trf)
 	{
 
-			var arr = [0,1,2,3,4,5];
-			arr.strip(2);
-	console.log(arr);
 		var bytes = Tx.trfToUnsignedBytes(trf);
+		var message = Tx.bytesToString(bytes);
 
-		console.log(bytes);
+		Dialog.txReq(message, bytes, function(message, bytes, res) {
+			// when the user clicks something
 
-		// k now lets get some data...?
+			Tx.addLog(message, bytes, res);
+			if(res)
+			{
+				
+			}
+		})
+	}
 
+	Tx.bytesToString = function(bytes)
+	{
 		var type = bytes[0];
 		var subtype = bytes[1] % 16;
 		var sender = getAccountIdFromPublicKey(converters.byteArrayToHexString(bytes.slice(8, 8+32)), true);
@@ -289,8 +296,9 @@ jQuery(document).ready(function($) {
 
 		var message = "";
 
+
+
 		bytes.strip(txlen);
-		console.log(bytes);
 
 
 		// types and subtypes
@@ -312,20 +320,8 @@ jQuery(document).ready(function($) {
 			}
 			else if(subtype == Tx.subtypes.aliasAssignment) 
 			{
-				mesage += Tx.bold("Register alias '", Tx.string(bytes))
-
-				typeName = "Alias Assignment";
-				setReview(1, "Type", typeName);
-				setReview(2, "Registrar", sender);
-				var alias = converters.byteArrayToString(rest.slice(2, rest[1]+2));
-				setReview(3, "Alias Name", alias);
-				setReview(4, "Fee", fee/100000000 + " nxt");
-				var data = converters.byteArrayToString(rest.slice(4+rest[1], 4+rest[1]+bytesWord([rest[2+rest[1]], rest[3+rest[1]]])));
-				$("#modal_review_description").removeAttr("disabled");
-				$("#modal_review_description").attr("data-content", data);
-				if(rest.length > 2+rest[1]+bytesWord(rest.slice(2+rest[1], 4+rest[1]))) msg = rest.slice(2+rest[1]+bytesWord(rest.slice(2+rest[1], 4+rest[1])));
-
-				$("#tx_desc").html("Create/update alias <b>" + alias + "</b>");
+				message += Tx.bold("Register alias '", Tx.stringFromLen(bytes, 1, 1), "' with data '", Tx.stringFromLen(bytes, 2), "'");
+				message += Tx.feeCalc(fee);
 			}
 		}
 
@@ -333,43 +329,41 @@ jQuery(document).ready(function($) {
 
 		if(Tx.getModifierBit(flags, 0))
 		{
-			var len = bytesWord([bytes[1],bytes[2]]);
-			var str = converters.byteArrayToString(bytes.slice(5,5+len));
-			message += Tx.bold(", with message: '", Util.xss(str), "'");
-
-			bytes.strip(4+len);
+			message += Tx.bold(", with message: '", Tx.stringFromLen(bytes, 4, 1), "'");
 		}
 
 		if(Tx.getModifierBit(flags, 2))
 		{
 			var str = converters.byteArrayToHexString(msg.slice(1,65));
 			message += Tx.bold(", with public key: '",Util.xss(str), "'");
-			bytes.strip(65);	
+			bytes.strip(65);
 		}
 
 		message += "?";
 
-		console.log(Util.xss(message));
-
-		Dialog.txReq(message, bytes, function(res, bytes) {
-			
-		})
+		return message;
 	}
 
-	Tx.stringFromLen = function(&bytes, len, offset)
+	Tx.stringFromLen = function(bytes, len, offset)
 	{
+		if(offset == undefined) offset = 0;
 		if(len == 1)
 		{
 			return Tx.modString(bytes, bytes[offset], offset+1);
 		}
 		else if(len == 2)
 		{
-			return Tx.modString(bytes, Tx.bytesWord(bytes[offset],bytes[offset+1]), offset+2);
+			return Tx.modString(bytes, Tx.bytesWord([bytes[offset],bytes[offset+1]]), offset+2);
+		}
+		else if(len == 4)
+		{
+			return Tx.modString(bytes, Tx.bytesWord([bytes[offset],bytes[offset+1]]), offset+4);
 		}
 	}
 
-	Tx.modString = function(&bytes, len, offset)
+	Tx.modString = function(bytes, len, offset)
 	{
+		console.log(bytes);
 		if(offset == undefined) offset = 0;
 		var out = converters.byteArrayToString(bytes.slice(offset, len+offset));
 		bytes.strip(len+offset);
@@ -403,7 +397,7 @@ jQuery(document).ready(function($) {
 			var collect = [];
 			collect = [bytes[0],bytes[1]]; // type ver & subtype
 			collect = collect.concat(nxtTimeBytes()); // timestamp
-			collect = collect.concat(wordBytes(1440)); // deadline
+			collect = collect.concat(Tx.wordBytes(1440)); // deadline
 			var senderPubKey = converters.hexStringToByteArray(Tx.me.publicKey);
 			collect = collect.concat(senderPubKey);
 			collect = collect.concat(bytes.slice(2, 2+8)); // recipient/genesis
@@ -448,6 +442,21 @@ jQuery(document).ready(function($) {
 	Tx.broadcastBytes = function(bytes)
 	{
 		// talk to the keyring here...
+	}
+
+	Tx.wordBytes = function(word)
+	{
+		return [(word%256), Math.floor(word/256)];
+	}
+
+	Tx.bytesWord = function(bytes)
+	{
+		return bytes[1]*256+bytes[0];
+	}
+
+	Tx.addHistory = function(message, bytes, res)
+	{
+		// puts this on the tx history
 	}
 
 	// converters, we all love them.
