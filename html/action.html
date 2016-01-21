@@ -4,6 +4,13 @@
 	<link href="../css/font-awesome.min.css" rel="stylesheet" />
 
 	<script src="../lib/jquery.js"></script>
+	<script src="../lib/converters.js"></script>
+	<script src="../lib/jssha256.js"></script>
+	<script src="../lib/jsbn.js"></script>
+	<script src="../lib/jsbn2.js"></script>
+	<script src="../lib/nxtaddress.js"></script>
+	<script src="../lib/curve25519.js"></script>
+	<script src="../js/util.js"></script>
 	<script src="../js/action.js"></script>
 </head>
 <body id="jay_action">
@@ -311,5 +318,26 @@
 			<button type="button" class="jay-btn jay-btn-em" data-i18n="new_account">New Account</button>
 		</div>
 	</div>
+
+	<div style="display: none;" id="jay_req">
+		<div id="jay_req_content">
+			<div class="jay-dialog-body">
+				<h2>Transaction requested</h2>
+				<p id="jay_req_msg">
+					Send <strong>23 NXT</strong> to <strong>a person</strong> with a <strong>1 NXT</strong> fee?
+				</p>
+				<div class="jay-input-group">
+					<input type="text" id="jay_req_passphrase" class="jay-input" placeholder="Passphrase" />
+				</div>
+
+			</div>
+			<div class="jay-dialog-btn">
+				<button id="jay_req_cancel" type="button" class="jay-btn">CANCEL</button> 
+				<button id="jay_req_accept" type="button" class="jay-btn">ACCEPT</button>
+			</div>
+		</div>
+	</div>
+
+
 </body>
 </html> 

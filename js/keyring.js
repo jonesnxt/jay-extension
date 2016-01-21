@@ -22,6 +22,11 @@ JayDB.init = function() {
 			{
 				JayDB.loadDB(JayDB.schema[a], JayDB.loaded);
 			}
+
+			if(JayDB.schema.length == 0)
+			{
+				JayDB.firsttime();
+			}
 		}
 		else
 		{
@@ -55,15 +60,40 @@ JayDB.ready = function() {
 	console.log("db has been offloaded");
 }
 
+JayDB.firsttime = function() {
+	// initialize a db to test
+	JayDB.createTable("trf", ["trf"], function() {JayDB.ready();});
+}
+
 JayDB.createTable = function(name, schema, callback)
 {
+	if(JayDB.tableExists(name)) callback();
 	JayDB.schema.push(name);
+	JayDB.db[name] = {};
+	JayDB.db[name].rows = [];
+	JayDB.db[name].keys = schema;
+
 	JayDB.toExt("schema", JSON.stringify(JayDB.schema), function() {
 		JayDB.toExt("schema."+name, JSON.stringify(schema), function() {
 			JayDB.toExt(name, "[]", callback);
 		})
 	})
-	
+}
+
+JayDB.removeTable = function(name, callback)
+{
+	JayDB.schema.splice(JayDB.schema.indexOf(name), 1);
+	JayDB.db[name] = undefined;
+	JayDB.toExt("schema", JSON.stringify(JayDB.schema), function() {
+		JayDB.toExt("schema."+name, "", function() {
+			JayDB.toExt(name, "", callback);
+		})
+	})
+}
+
+JayDB.tableExists = function(table)
+{
+	return JayDB.db[table] != undefined;
 }
 
 JayDB.toExt = function(key, value, callback)
@@ -86,6 +116,40 @@ JayDB.insert = function(table, values, callback)
 		tbl.push(values);
 		JayDB.toExt(table, JSON.stringify(tbl), callback);
 	})
+}
+
+JayDB.remove = function(table, key, compare, callback)
+{
+	var schema = JayDB.db[table].keys;
+	var ret = [];
+	var k = -1;
+	for(var a=0;a<schema.length;a++)
+	{
+		if(schema[a] == key)
+		{
+			k = a;
+		}
+	}
+	if(k == -1)
+	{
+		console.log("Key not found");
+	}
+	else
+	{
+		for(var b=0;b<JayDB.db[table].rows.length;b++)
+		{
+			if(JayDB.db[table].rows[b][k] == compare)
+			{
+				JayDB.db[table].rows.splice(b, 1);
+			}
+		}
+	}
+	JayDB.toExt(table, JSON.stringify(JayDB.db[table].rows), callback);
+}
+
+JayDB.count = function(table)
+{
+	return JayDB.db[table].rows.length;
 }
 
 JayDB.select = function(table, key, compare)

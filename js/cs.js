@@ -107,6 +107,7 @@ jQuery(document).ready(function($) {
 	{
 		message.source = "cs";
 		message.location = "action";
+		console.log("sending");
 		chrome.runtime.sendMessage(message, callback);
 	}
 	Comm.fromAction = function(request, sender, callback)
@@ -131,7 +132,9 @@ jQuery(document).ready(function($) {
 	Dialog.templates.txReqBef = '<div style="opacity: 0;" class="jay-dialog"><div class="jay-dialog-content"><div class="jay-dialog-body"><h2>Transaction Request<img class="jay-logo" src="'+chrome.extension.getURL("./img/jay.png")+'"></h2><p class="msg">';
 	Dialog.templates.txReqAft = '</p></div><div class="jay-dialog-btn"><button id="jay_cancel" type="button" class="jay-btn">CANCEL</button> <button id="jay_accept" type="button" class="jay-btn">ACCEPT</button></div></div></div>';
 
-	Dialog.txReq = function(msg, bytes, callback)
+	Dialog.templates.txReqAbove = '<div style="opacity: 0;" class="jay-dialog"><div class="jay-dialog-content"><div class="jay-dialog-body"><h2>Transaction Requested<img class="jay-logo" src="'+chrome.extension.getURL("./img/jay.png")+'"></h2><p class="msg">Please click the <strong>extension button</strong> next to the address bar to complete this transaction.</p></div><div class="jay-dialog-btn"><button id="jay_cancel" type="button" class="jay-btn">CANCEL</button></div></div></div>';
+
+	/*Dialog.txReq = function(msg, bytes, callback)
 	{
 		$("body").append(Dialog.templates.txReqBef+msg+Dialog.templates.txReqAft);
 		$(".jay-dialog .msg strong").each(function() {
@@ -150,12 +153,28 @@ jQuery(document).ready(function($) {
 				callback(true, bytes);
 			});
 		});
+	}*/
+
+	Dialog.txReq = function(callback)
+	{
+		$("body").append(Dialog.templates.txReqAbove);
+
+		Trs.propTween(".jay-dialog", "opacity", 1, 200, Trs.eases.sqrt);
+
+		$("#jay_cancel").click(function() {
+			Dialog.close(function() {
+				Comm.toPage("false");
+				callback(false);
+			})
+		})
+
 	}
 
-	Dialog.close = function(msg, callback)
+	Dialog.close = function(callback)
 	{
 		Trs.propTween(".jay-dialog", "opacity", 0, 200, Trs.eases.sqrt, function() {
 			$(".jay-dialog").remove();
+			callback();
 		});
 
 	}
@@ -190,274 +209,7 @@ jQuery(document).ready(function($) {
 	}
 
 	// decoding transaction bytes and turning Jay codes into transaction bytes
-	var Tx = {};
-	Tx.init = function()
-	{
-
-	}
-
-	Tx.types = {};
-	Tx.subtypes = {};
-
-	Tx.oneNxt = new BigInteger("100000000");	
-	Tx.types.payment = 0;
-	Tx.types.messaging = 1;
-	Tx.types.asset = 2;
-	Tx.types.marketplace = 3;
-	Tx.types.accountControl = 4;
-	Tx.types.monetarySystem = 5;
-	Tx.types.supernet = 100;
-
-	Tx.subtypes.ordinaryPayment = 0;
-	Tx.subtypes.arbitraryMessage = 0;
-	Tx.subtypes.aliasAssignment = 1;
-	Tx.subtypes.pollCreation = 2;
-	Tx.subtypes.voteCasting = 3;
-	Tx.subtypes.hubAnnouncement = 4;
-	Tx.subtypes.accountInfo = 5
-	Tx.subtypes.aliasSell = 6;
-	Tx.subtypes.aliasBuy = 7;
-	Tx.subtypes.aliasDelete = 8;
-	Tx.subtypes.assetIssuance = 0;
-	Tx.subtypes.assetTransfer = 1;
-	Tx.subtypes.askOrderPlacement = 2;
-	Tx.subtypes.bidOrderPlacement = 3;
-	Tx.subtypes.askOrderCancellation = 4;
-	Tx.subtypes.bidOrderCancellation = 5;
-	Tx.subtypes.goodsListing = 0;
-	Tx.subtypes.goodsDelisting = 1;
-	Tx.subtypes.priceChange = 2;
-	Tx.subtypes.quantityChange = 3;
-	Tx.subtypes.purchase = 4;
-	Tx.subtypes.delivery = 5;
-	Tx.subtypes.feedback = 6;
-	Tx.subtypes.refund = 7;
-	Tx.subtypes.balanceLeasing = 0;
-	Tx.subtypes.currencyIssuance = 0;
-	Tx.subtypes.reserveIncrease = 1;
-	Tx.subtypes.reserveClaim = 2;
-	Tx.subtypes.currencyTransfer = 3;
-	Tx.subtypes.exchangeOffer = 4;
-	Tx.subtypes.exchangeBuy = 5;
-	Tx.subtypes.exchangeSell = 6;
-	Tx.subtypes.currencyMinting = 7;
-	Tx.subtypes.currencyDeletion = 8;
-	Tx.subtypes.verifyMgwDepositAddrV1 = 0;
-
-	Tx.appendages = {};
-	Tx.appendages.none = 0;
-	Tx.appendages.message = 1;
-	Tx.appendages.encryptedMessage = 2;
-	Tx.appendages.publicKeyAnnouncement = 4;
-	Tx.appendages.encryptedMessageToSelf = 8;
-	Tx.appendages.phasedTransaction = 16;
-
-
-	Tx.transactionVersion = 1;
-	Tx.TRFVersion = 1;
-
-	Array.prototype.strip = function(num)
-	{
-		this.splice(0, num);
-	}
-
-
-
-	Tx.handle = function(trf)
-	{
-
-		var bytes = Tx.trfToUnsignedBytes(trf);
-		var message = Tx.bytesToString(bytes);
-
-		Dialog.txReq(message, bytes, function(message, bytes, res) {
-			// when the user clicks something
-
-			Tx.addLog(message, bytes, res);
-			if(res)
-			{
-				
-			}
-		})
-	}
-
-	Tx.bytesToString = function(bytes)
-	{
-		var type = bytes[0];
-		var subtype = bytes[1] % 16;
-		var sender = getAccountIdFromPublicKey(converters.byteArrayToHexString(bytes.slice(8, 8+32)), true);
-		var r = new NxtAddress();
-		r.set(byteArrayToBigInteger(bytes.slice(40, 48)).toString());
-		var recipient = r.toString();
-		var amount = byteArrayToBigInteger(bytes.slice(48, 48+8));
-		var fee = byteArrayToBigInteger(bytes.slice(56, 56+8));
-		var flags = converters.byteArrayToSignedInt32(bytes.slice(160, 160+4));
-
-		var txlen = 176;
-
-		var message = "";
-
-
-
-		bytes.strip(txlen);
-
-
-		// types and subtypes
-
-		if(type == Tx.types.payment)
-		{
-			if(subtype == Tx.subtypes.ordinaryPayment)
-			{
-				message += Tx.bold("Send ",Tx.formatNxt(amount)," to ",recipient);
-				message += Tx.feeCalc(fee);
-			}
-		}
-		else if(type == Tx.types.messaging)
-		{
-			if(subtype == Tx.subtypes.arbitraryMessage)
-			{
-				message += Tx.bold("Send Message to ", recipient);
-				message += Tx.feeCalc(fee);
-			}
-			else if(subtype == Tx.subtypes.aliasAssignment) 
-			{
-				message += Tx.bold("Register alias '", Tx.stringFromLen(bytes, 1, 1), "' with data '", Tx.stringFromLen(bytes, 2), "'");
-				message += Tx.feeCalc(fee);
-			}
-		}
-
-		// appendages
-
-		if(Tx.getModifierBit(flags, 0))
-		{
-			message += Tx.bold(", with message: '", Tx.stringFromLen(bytes, 4, 1), "'");
-		}
-
-		if(Tx.getModifierBit(flags, 2))
-		{
-			var str = converters.byteArrayToHexString(msg.slice(1,65));
-			message += Tx.bold(", with public key: '",Util.xss(str), "'");
-			bytes.strip(65);
-		}
-
-		message += "?";
-
-		return message;
-	}
-
-	Tx.stringFromLen = function(bytes, len, offset)
-	{
-		if(offset == undefined) offset = 0;
-		if(len == 1)
-		{
-			return Tx.modString(bytes, bytes[offset], offset+1);
-		}
-		else if(len == 2)
-		{
-			return Tx.modString(bytes, Tx.bytesWord([bytes[offset],bytes[offset+1]]), offset+2);
-		}
-		else if(len == 4)
-		{
-			return Tx.modString(bytes, Tx.bytesWord([bytes[offset],bytes[offset+1]]), offset+4);
-		}
-	}
-
-	Tx.modString = function(bytes, len, offset)
-	{
-		console.log(bytes);
-		if(offset == undefined) offset = 0;
-		var out = converters.byteArrayToString(bytes.slice(offset, len+offset));
-		bytes.strip(len+offset);
-		return out;
-	}
-
-	Tx.getModifierBit = function(target, position)
-	{
-		return (target >> position)%2;
-	}
-
-	Tx.feeCalc = function(fee)
-	{
-		return Tx.bold(" with a fee of ", Tx.formatNxt(fee));
-	}
-
-	Tx.formatNxt = function(nxt)
-	{
-		return nxt.divide(Tx.oneNxt).toString()+" NXT";
-	}
-
-	Tx.trfToUnsignedBytes = function(trfBytes)
-	{
-		var bytes = base62Decode(trfBytes.substring(4));
-		console.log(bytes);
-		if(bytes[0] == '1' || bytes[0] == '2')
-		{
-			bytes = bytes.slice(1);
-			if(bytes.length == 31) bytes = bytes.slice(0, 30);
-
-			var collect = [];
-			collect = [bytes[0],bytes[1]]; // type ver & subtype
-			collect = collect.concat(nxtTimeBytes()); // timestamp
-			collect = collect.concat(Tx.wordBytes(1440)); // deadline
-			var senderPubKey = converters.hexStringToByteArray(Tx.me.publicKey);
-			collect = collect.concat(senderPubKey);
-			collect = collect.concat(bytes.slice(2, 2+8)); // recipient/genesis
-			collect = collect.concat(bytes.slice(10, 10+8)); // amount
-			collect = collect.concat(bytes.slice(18, 18+8)); // fee
-			collect = collect.concat(pad(32, 0)); // reftxhash
-			collect = collect.concat(pad(64, 0)); // signature bytes
-			collect = collect.concat(bytes.slice(26, 26+4)); // flags
-			collect = collect.concat(pad(4, 0)); // EC blockheight
-			collect = collect.concat(pad(8, 0)); // EC blockid
-			if(bytes.length > 30) collect = collect.concat(bytes.slice(30)); // attachment/appendages
-			
-			return collect;
-		}
-		else 
-		{
-			Error.fatal("incorrect trf byte version");
-			return false;
-		}
-	}
-
-	Tx.me = {};
-	Tx.me.publicKey = "256a084705a5ddd1f8b9b3e81d08f7493a99a50a9582f7d6995df07c32076309";
-
-
-	Tx.bold = function()
-	{
-		var output = "";
-		for(var i=0;i<arguments.length;i++)
-		{
-			if(i%2 == 1) output += "<strong>"+Util.xss(arguments[i])+"</strong>";
-			else output += arguments[i];
-		}
-		return output;
-	}
-
-	Tx.rewiewBytes = function(bytes)
-	{
-
-	}
-
-	Tx.broadcastBytes = function(bytes)
-	{
-		// talk to the keyring here...
-	}
-
-	Tx.wordBytes = function(word)
-	{
-		return [(word%256), Math.floor(word/256)];
-	}
-
-	Tx.bytesWord = function(bytes)
-	{
-		return bytes[1]*256+bytes[0];
-	}
-
-	Tx.addHistory = function(message, bytes, res)
-	{
-		// puts this on the tx history
-	}
+	
 
 	// converters, we all love them.
 	var Cnv = {};
